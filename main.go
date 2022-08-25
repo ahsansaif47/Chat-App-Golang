@@ -47,13 +47,13 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			that server and client are both responding to
 			each other..
 		*/
-		_, bytes, err := ws.ReadMessage()
+		_, _, err := ws.ReadMessage()
 		if err != nil {
 			// handleDisconnect(ws)
 			break
 		}
 		// Converting the bytes message to string format..
-		msg := string(bytes)
+		// msg := string(bytes)
 		// handleIncommingMessage(ws, msg)
 	}
 }
@@ -74,11 +74,12 @@ func echoServer(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
-		msg := string(bytes)
+		ws.WriteMessage(websocket.TextMessage, bytes)
 	}
 }
 
 func main() {
 	http.HandleFunc("/verify", handler)
-	http.ListenAndServe("", nil)
+	http.HandleFunc("/echo", echoServer)
+	http.ListenAndServe(":8081", nil)
 }
