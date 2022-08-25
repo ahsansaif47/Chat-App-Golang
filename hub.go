@@ -19,7 +19,7 @@ func handleIncommingMessage(sender websocket.Conn, msg string) {
 		map then he/she can send message..
 	*/
 	if _, ok := connNameMap[&sender]; ok {
-		// sendChatMessage(sender, msg)
+		sendChatMessage(sender, msg)
 		return
 	}
 
@@ -119,8 +119,20 @@ func newMessage(msgType messageType, sender string, content string) message {
 	}
 }
 
+// Sending messages to all the users..
 func dispatch(m message) {
 	for client, _ := range connNameMap {
 		client.WriteJSON(m)
 	}
+}
+
+/*
+	1. Composing a message
+	2. Sending message
+*/
+func sendChatMessage(sender *websocket.Conn, msg string) {
+	// Generating the message..
+	m := newMessage(msgChat, connNameMap[sender], msg)
+	// Dispatching message..
+	dispatch(m)
 }
