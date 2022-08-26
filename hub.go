@@ -13,12 +13,12 @@ var connNameMap = make(map[*websocket.Conn]string)
 // Map to check that people dont register with same user name..
 var nameConnMap = make(map[string]*websocket.Conn)
 
-func handleIncommingMessage(sender websocket.Conn, msg string) {
+func handleIncommingMessage(sender *websocket.Conn, msg string) {
 	/*
 		If the user is found in connection to name
 		map then he/she can send message..
 	*/
-	if _, ok := connNameMap[&sender]; ok {
+	if _, ok := connNameMap[sender]; ok {
 		sendChatMessage(sender, msg)
 		return
 	}
@@ -36,11 +36,11 @@ func handleIncommingMessage(sender websocket.Conn, msg string) {
 	}
 
 	// sendUserList(sender)
-	connNameMap[&sender] = username
-	nameConnMap[username] = &sender
+	connNameMap[sender] = username
+	nameConnMap[username] = sender
 
 	m := newMessage(msgJoin, "Server", username)
-	m.dispatch()
+	dispatch(m)
 }
 
 func disconnectionHandler(sender *websocket.Conn) {
@@ -50,7 +50,7 @@ func disconnectionHandler(sender *websocket.Conn) {
 	}
 
 	m := newMessage(msgLeave, "Server", username)
-	m.dispatch()
+	dispatch(m)
 	/*
 		Deleting the values from both maps
 		So they can further be used by
@@ -121,7 +121,7 @@ func newMessage(msgType messageType, sender string, content string) message {
 
 // Sending messages to all the users..
 func dispatch(m message) {
-	for client, _ := range connNameMap {
+	for client := range connNameMap {
 		client.WriteJSON(m)
 	}
 }

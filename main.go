@@ -47,14 +47,14 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			that server and client are both responding to
 			each other..
 		*/
-		_, _, err := ws.ReadMessage()
+		_, bytes, err := ws.ReadMessage()
 		if err != nil {
-			// handleDisconnect(ws)
+			disconnectionHandler(ws)
 			break
 		}
 		// Converting the bytes message to string format..
-		// msg := string(bytes)
-		// handleIncommingMessage(ws, msg)
+		msg := string(bytes)
+		handleIncommingMessage(ws, msg)
 	}
 }
 
@@ -81,5 +81,6 @@ func echoServer(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/verify", handler)
 	http.HandleFunc("/echo", echoServer)
+	http.HandleFunc("/chatserver", socketHandler)
 	http.ListenAndServe(":8081", nil)
 }
