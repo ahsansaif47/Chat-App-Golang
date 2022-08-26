@@ -43,7 +43,7 @@ func handleIncommingMessage(sender *websocket.Conn, msg string) {
 	dispatch(m)
 }
 
-func disconnectionHandler(sender *websocket.Conn) {
+func handleDisconnection(sender *websocket.Conn) {
 	username, ok := connNameMap[sender]
 	if !ok {
 		return

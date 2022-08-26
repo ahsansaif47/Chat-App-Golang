@@ -7,10 +7,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello World")
-}
-
 /*
 	Configurations for upgrader
 	Converts the connection from regular
@@ -20,6 +16,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+}
+
+// Server the index.html file on root path
+func homePage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "../static/index.html")
 }
 
 // Setting up for accepting incomming connections..
@@ -49,7 +50,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		*/
 		_, bytes, err := ws.ReadMessage()
 		if err != nil {
-			disconnectionHandler(ws)
+			handleDisconnection(ws)
 			break
 		}
 		// Converting the bytes message to string format..
@@ -79,7 +80,7 @@ func echoServer(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/verify", handler)
+	http.HandleFunc("/", homePage)
 	http.HandleFunc("/echo", echoServer)
 	http.HandleFunc("/chatserver", socketHandler)
 	http.ListenAndServe(":8081", nil)
